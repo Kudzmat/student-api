@@ -1,22 +1,45 @@
 package com.example.demo.student;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
-import java.time.Month;
 import java.util.List;
 
 @RestController
 @RequestMapping(path = "api/v1/student")
 public class StudentController {
 
+    private final StudentService studentService;  // reference to student service
+
+
+    @Autowired // will instantiate new StudentService & pass reference inside the controller
+    public StudentController(StudentService studentService) {
+        this.studentService = studentService;
+    }
+
     @GetMapping
     public List<Student> getStudents() {
-        return List.of(new Student("Luigi",
-                "greenguy@nin.com",
-                LocalDate.of(1985, Month.AUGUST, 8),
-                38));
+        return studentService.getStudents();
+    }
+
+    @PostMapping
+    public void registerNewStudent(@RequestBody Student student) {
+        studentService.addNewStudent(student);
+    }
+
+    @DeleteMapping(path = "{studentID}")
+    public void deleteStudent(@PathVariable("studentID") Long studentId) {
+
+        studentService.deleteStudent(studentId);
+
+    }
+
+    @PutMapping(path = "{studentId}")
+    public void updateStudent(@PathVariable("studentId") Long studentId, @RequestParam(required = false) String name, @RequestParam(required = false) String email) {
+        studentService.updateStudent(studentId, name, email);
     }
 }
+
+
+
+
